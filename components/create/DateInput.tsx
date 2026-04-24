@@ -1,10 +1,14 @@
-import { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import Text from '../ui/Text';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useState } from 'react';
 
-export default function DateInput() {
-  const [date, setDate] = useState(new Date());
+interface Props {
+  date: Date;
+  onChange: (date: Date) => void;
+}
+
+export default function DateInput({ date, onChange }: Props) {
   const [show, setShow] = useState(false);
 
   return (
@@ -22,7 +26,7 @@ export default function DateInput() {
           mode="date"
           onChange={(event, selectedDate) => {
             setShow(false);
-            if (selectedDate) setDate(selectedDate);
+            if (selectedDate) onChange(selectedDate);
           }}
         />
       )}

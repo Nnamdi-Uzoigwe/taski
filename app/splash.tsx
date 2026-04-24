@@ -1,34 +1,13 @@
-// import { useEffect } from "react";
-// import { View } from "react-native";
-// import { useRouter } from "expo-router";
-// import Text from "@/components/ui/Text";
-
-// export default function Splash() {
-//   const router = useRouter();
-
-//   useEffect(() => {
-//     const timer = setTimeout(() => {
-//       router.replace("/onboarding/step-one"); // or "(tabs)/home" if already onboarded
-//     }, 3000);
-
-//     return () => clearTimeout(timer);
-//   }, []);
-
-//   return (
-//     <View className="flex-1 items-center justify-center bg-blue-400">
-//       <Text weight="bold" size="3xl" className="text-white">Taski</Text>
-//       <Text className="text-gray-100">Do more, stress less</Text>
-//     </View>
-//   );
-// }
-
 import { useEffect, useRef } from "react";
 import { View, Animated, Easing } from "react-native";
 import { useRouter } from "expo-router";
 import Text from "@/components/ui/Text";
+import { hasSeenOnboarding } from "@/lib/onboarding";
+import { useAuthStore } from "@/store/authStore";
 
 export default function Splash() {
   const router = useRouter();
+  const { token } = useAuthStore();
 
   const iconScale = useRef(new Animated.Value(0)).current;
   const textOpacity = useRef(new Animated.Value(0)).current;
@@ -60,12 +39,20 @@ export default function Splash() {
         toValue: 1,
         duration: 2000,
         easing: Easing.inOut(Easing.ease),
-        useNativeDriver: false, // width can't use native driver
+        useNativeDriver: false,
       }),
     ]).start();
 
-    const timer = setTimeout(() => {
-      router.replace("/onboarding/step-one");
+    const timer = setTimeout(async () => {
+      const seen = await hasSeenOnboarding();
+
+      if (!seen) {
+        router.replace("/onboarding/step-one");
+      } else if (token) {
+        router.replace("/(tabs)/todo");
+      } else {
+        router.replace("/(auth)/login");
+      }
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -73,7 +60,6 @@ export default function Splash() {
 
   return (
     <View className="flex-1 items-center justify-center bg-blue-400 gap-2">
-      {/* Icon */}
       <Animated.View
         style={{ transform: [{ scale: iconScale }] }}
         className="w-20 h-20 rounded-2xl bg-white/20 items-center justify-center mb-2"
@@ -81,7 +67,6 @@ export default function Splash() {
         <Text size="3xl">✓</Text>
       </Animated.View>
 
-      {/* Text */}
       <Animated.View
         style={{ opacity: textOpacity, transform: [{ translateY: textY }] }}
         className="items-center gap-1"
@@ -92,7 +77,6 @@ export default function Splash() {
         <Text className="text-white/80 text-sm">Do more, stress less</Text>
       </Animated.View>
 
-      {/* Progress bar */}
       <Animated.View className="mt-8 h-[3px] w-28 bg-white/25 rounded-full overflow-hidden">
         <Animated.View
           className="h-full bg-white rounded-full"
