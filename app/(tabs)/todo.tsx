@@ -23,7 +23,7 @@ const mockTasks: Task[] = [];
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
-        <View className="my-10 flex gap-4">
+        <View className="mt-4 mb-10 flex gap-4">
           <Text size="2xl" weight="regular">
             Welcome,{" "}
             <Text size="2xl" weight="regular" className="text-blue-500">
